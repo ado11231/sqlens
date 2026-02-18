@@ -20,6 +20,7 @@ def csv_loader(csv_path):
     
     return csv_df
 
+# Loads a JSON file and returns it as a DataFrame
 def json_loader(json_path):
     if not os.path.exists(json_path):
         raise FileNotFoundError(f"File Not Found {json_path}")
@@ -47,8 +48,9 @@ def json_loader(json_path):
     
     return json_df
 
+# Loads an Excel file and returns the specified sheet as a DataFrame
 def excel_loader(excel_path, sheet = 0):
-    if not os.path.exsists(excel_path):
+    if not os.path.exists(excel_path):
         raise FileNotFoundError(f"File Not Found {excel_path}")
     
     try:
@@ -59,3 +61,17 @@ def excel_loader(excel_path, sheet = 0):
         raise ValueError("File is Not Excel File")
         
     return excel_df
+
+# Routes a file path to the correct loader based on its extension
+def dispatcher(path, sheet=0):
+    name, ext = os.path.splitext(path)
+
+    if ext == ".csv":
+        load = csv_loader(path)
+    elif ext == ".json":
+        load = json_loader(path)
+    elif ext in (".xlsx", ".xls", ".xlsm"):
+        load = excel_loader(path, sheet)
+    else:
+        raise ValueError(f"Unsupported File Type {ext}")
+    return load

@@ -5,19 +5,24 @@ import pandas as pd
 from pathlib import Path
 
 class DatabaseManager:
+    # Initializes the DatabaseManager and opens a connection
     def __init__(self, db_path="copydata.db"):
         self.db_path = db_path
         self._connect()
 
+    # Opens the SQLite connection to the database file
     def _connect(self):
         self.con = sqlite3.connect(self.db_path)
 
+    # Allows use as a context manager (with statement)
     def __enter__(self):
         return self
-    
+
+    # Closes the connection when exiting the context manager
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
 
+    # Sanitizes a string into a valid SQLite table name
     def _clean_table_name(self, name):
         if not name:
             return "unnamed_table"
@@ -32,6 +37,7 @@ class DatabaseManager:
         
         return name
 
+    # Loads a pandas DataFrame into the database as a table
     def load_dataframe(self, name, df: pd.DataFrame):
         if df.empty:
             print("Dataframe Empty")
@@ -50,6 +56,7 @@ class DatabaseManager:
             print(e)
             return
 
+    # Runs a SQL query and returns the result as a DataFrame
     def run_query(self, query):
         try:
             result = pd.read_sql_query(query, self.con)
@@ -58,6 +65,7 @@ class DatabaseManager:
             print(e)
             return
 
+    # Returns a list of all tables with their row count and column names
     def list_tables(self):
         cursor = self.con.execute("SELECT name FROM sqlite_master WHERE type='table' ")
         tables = cursor.fetchall()
@@ -86,6 +94,7 @@ class DatabaseManager:
 
         return results
     
+    # Drops a table from the database by name
     def drop_table(self, table_name):
         try:
             clean_name = self._clean_table_name(table_name)
