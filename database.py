@@ -56,16 +56,14 @@ class DatabaseManager:
             print(e)
             return
 
-    # Runs a SQL query and returns the result as a DataFrame
     def run_query(self, query):
         try:
             result = pd.read_sql_query(query, self.con)
             return result
-        except sqlite3.OperationalError as e:
+        except (sqlite3.OperationalError, pd.errors.DatabaseError) as e:
             print(e)
             return
 
-    # Returns a list of all tables with their row count and column names
     def list_tables(self):
         cursor = self.con.execute("SELECT name FROM sqlite_master WHERE type='table' ")
         tables = cursor.fetchall()
@@ -94,11 +92,10 @@ class DatabaseManager:
 
         return results
     
-    # Drops a table from the database by name
     def drop_table(self, table_name):
         try:
             clean_name = self._clean_table_name(table_name)
-            cursor = self.con.execute(f"DROP TABLE IF EXISTS {table_name}")
+            cursor = self.con.execute(f"DROP TABLE IF EXISTS {clean_name}")
             self.con.commit()
         except sqlite3.OperationalError as e:
             print(e)

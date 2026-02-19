@@ -4,7 +4,6 @@ import json
 
 #Function to import to CSV File, check if the file is exists first
 #Then checks for other errors before returning CSV as dataframe
-
 def csv_loader(csv_path):
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"File Not Found {csv_path}")
@@ -13,7 +12,7 @@ def csv_loader(csv_path):
         csv_df = pd.read_csv(csv_path)
     except pd.errors.EmptyDataError:
         raise ValueError("File Is Empty or Invalid")
-    except pd.errors.ParseError:
+    except pd.errors.ParserError:
         raise ValueError("CSV file is corrupt or malformed")
     except OSError:
         raise OSError("File cannot be read")
@@ -54,7 +53,7 @@ def excel_loader(excel_path, sheet = 0):
         raise FileNotFoundError(f"File Not Found {excel_path}")
     
     try:
-        excel_df = pd.read_excel(excel_path, sheet, engine = "openpyxl")
+        excel_df = pd.read_excel(excel_path, sheet_name = sheet, engine = "openpyxl")
     except ImportError:
         raise ValueError("Openpyxl Not Installed")
     except OSError:
